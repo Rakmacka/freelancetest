@@ -1,0 +1,1454 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ScaleLab.se</title>
+  <meta name="description" content="Vi skalar varumärken med smarta kreativa ads, konverterande landningssidor och datadriven iterering." />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/css.gg/icons/all.css" rel="stylesheet">
+
+  <style>
+    html, body {
+      overflow-x: hidden;
+    }
+
+    :root{
+      --bg:#ffffff; --text:#0a0a0a; --muted:#6b7280; --line:#e5e7eb; --ink:#111111;
+      --shadow:0 10px 30px rgba(0,0,0,.06); --radius:24px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0; font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,Apple Color Emoji,Segoe UI Emoji; color:var(--text); background:var(--bg); line-height:1.55; letter-spacing:.01em}
+    a{color:inherit; text-decoration:none}
+    img{max-width:100%; display:block}
+    .container{width:min(1100px,92vw); margin:0 auto}
+
+    /* --- Top progress bar on scroll --- */
+    .progress{position:fixed; inset:0 0 auto 0; height:3px; background:#000; transform-origin:left; transform:scaleX(0); z-index:60}
+
+    /* --- Nav --- */
+    .nav{position:sticky; top:0; backdrop-filter:saturate(180%) blur(12px); background:rgba(255,255,255,.72); border-bottom:1px solid var(--line); z-index:50}
+    .nav .inner{display:flex; align-items:center; justify-content:space-between; padding:14px 0; gap:12px}
+    .brand{display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.02em}
+    .brand-badge{width:33px; height:33px; border:1px solid #111; border-radius:8px; display:grid; place-items:center; font-size:14px; font-weight:700}
+    .brand-badge{
+  position: relative;
+  z-index: 0;                 /* skapar stacking context */
+  width: 33px; height: 33px;
+  border: 1px solid #111; border-radius: 8px;
+  display: grid; place-items: center;
+  font-size: 14px; font-weight: 700;
+  overflow: hidden;
+  color: #111;
+  transition: color .35s ease; /* mjuk färgväxling */
+}
+
+.brand-badge::before{
+  content:"";
+  position:absolute;
+  top:-25%; left:-25%;
+  width:150%; height:150%;
+  background:#111;
+  transform: translateX(-115%) skewX(-20deg);
+  transition: transform .45s ease;
+  z-index: -1;                /* LIGGER BAKOM TEXTEN */
+  pointer-events: none;       /* stjäl inte hover */
+}
+
+/* hover triggas av hela länken */
+.brand:hover .brand-badge::before{
+  transform: translateX(0) skewX(-20deg);
+}
+.brand:hover .brand-badge{
+  color:#fff;                 /* “SL” blir vit */
+}
+
+    .nav a{padding:10px 12px; border-radius:12px}
+    .nav a:hover{background:#f3f4f6}
+    .cta{display:inline-flex; align-items:center; gap:10px; padding:12px 18px; border:1px solid #111; border-radius:999px; font-weight:600; box-shadow:var(--shadow); transition: background-color 0.35s ease}
+    .cta:hover{background-color: black; color: #fff;}
+
+    /* Gör CTA-hover i naven svart (vinner över .nav a:hover) */
+.nav a.cta { 
+  background:#fff; 
+  transition: background-color .35s ease, color .35s ease, border-color .35s ease;
+}
+.nav a.cta:hover {
+  background:#111;
+  color:#fff;
+  border-color:#111;
+}
+
+
+/* Language switch */
+.lang {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lang button {
+  position: relative;
+  appearance: none;
+  border: 1px solid var(--line);
+  background: #fff;
+  padding: 8px 10px;
+  border-radius: 999px;
+  font-weight: 600;
+  cursor: pointer;
+  overflow: hidden;
+  z-index: 0;
+  transition: color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Fill-animation bakom texten */
+.lang button::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: #111;
+  transform: translateX(-100%);
+  transition: transform 0.35s ease;
+  z-index: -1;
+}
+
+.lang button:hover::before {
+  transform: translateX(0);
+}
+
+.lang button:hover {
+  color: #fff;
+  border-color: #111;
+}
+
+.lang button[aria-pressed="true"] {
+  border-color: #111;
+  background-color: #111;
+  color: #fff;
+  box-shadow: var(--shadow);
+}
+
+
+    /* stack nav on small */
+    @media (max-width:900px){
+      .desktop-nav, .desktop-lang{display:none !important;}
+      .hamburger{display:block;}
+      .brand{margin:0 auto;} /* centrera loggan */
+    }
+
+
+    /* --- Hero --- */
+    .hero{padding:70px 0 45px; position:relative}
+    .hero-grid{display:grid; grid-template-columns:1.1fr .9fr; gap:42px; align-items:end}
+    .kicker{display:inline-flex; align-items:center; gap:10px; padding:8px 12px; border:1px solid var(--line); border-radius:999px; font-size:12px; color:var(--muted)}
+    .title{font-size:clamp(32px, 5vw, 58px); line-height:1.05; letter-spacing:-.02em; margin:14px 0 14px}
+    .lead{font-size:clamp(16px, 2.2vw, 20px); color:#111; opacity:.85}
+    .hero-card{border:1px solid var(--line); border-radius:var(--radius); padding:20px; box-shadow:var(--shadow)}
+    .stat{display:grid; grid-template-columns:1fr auto; align-items:baseline; padding:14px 0; border-bottom:1px dashed var(--line)}
+    .stat:last-child{border-bottom:none}
+    .stat b{font-size:28px; letter-spacing:-.01em}
+    .stat small{color:var(--muted)}
+    .tags{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px}
+    .tag{border:1px solid var(--line); padding:8px 12px; border-radius:999px; font-size:12px; color:#111}
+
+    /* --- Marquee --- */
+    /* --- Marquee (brands) --- */
+.marquee{
+  --gap: 90px;      /* avstånd mellan loggor */
+  --h: 30px;        /* loggans höjd */
+  position: relative;
+  overflow: hidden;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: #fafafa;
+}
+
+/* mjuk fade i kanterna */
+.marquee::before,
+.marquee::after{
+  content:"";
+  position:absolute; top:0; bottom:0; width:8%;
+  pointer-events:none;
+  z-index:2;
+}
+.marquee::before{ left:0;  background:linear-gradient(90deg,#fafafa,transparent); }
+.marquee::after { right:0; background:linear-gradient(270deg,#fafafa,transparent); }
+
+.track{
+  display:flex; align-items:center;
+  gap: var(--gap);
+  padding: 18px 0;
+  will-change: transform;
+  animation: marquee var(--duration, 28s) linear infinite;
+}
+@keyframes marquee{ to{ transform: translateX(var(--shift,-50%)); } }
+
+/* paus vid hover */
+.marquee:hover .track{ animation-play-state: paused; }
+
+/* loggor */
+.logo{
+  height: var(--h); width:auto;
+  opacity:.85;
+  filter: grayscale(100%) contrast(1.05);
+  transition: transform .35s ease, filter .35s ease, opacity .35s ease;
+}
+.logo:hover{
+  transform: translateY(-2px) scale(1.06);
+  filter: grayscale(0%) saturate(1.1);
+  opacity:1;
+}
+
+/* Reduced motion: stäng av auto-scroll */
+@media (prefers-reduced-motion: reduce){
+  .track{ animation: none; }
+}
+
+
+    /* --- Sections --- */
+    section{padding:90px 0}
+    .section-head{display:flex; justify-content:space-between; align-items:end; gap:20px; margin-bottom:36px}
+    h2{font-size:clamp(26px,3.6vw,40px); letter-spacing:-.02em; margin:0}
+    p.muted{color:var(--muted); max-width:70ch}
+
+    /* --- Grid cards --- */
+    .grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:18px}
+    .card{border:1px solid var(--line); border-radius:18px; padding:18px; background:#fff; transition:transform .2s ease, box-shadow .2s ease}
+    .card:hover{transform:translateY(-3px); box-shadow:var(--shadow)}
+    .card .thumb{border-radius:14px; overflow:hidden; height:180px; background:#f3f4f6; display:grid; place-items:center}
+    .card h3{font-size:18px; margin:14px 0 8px}
+    .card p{color:#111; opacity:.85}
+
+    /* --- Process --- */
+    .steps{display:grid; grid-template-columns:repeat(4,1fr); gap:14px}
+    .step{border:1px solid var(--line); border-radius:16px; padding:16px}
+    .step .num{width:32px; height:32px; border-radius:8px; border:1px solid #111; display:grid; place-items:center; font-weight:700}
+
+    /* --- Metrics --- */
+    .metrics{display:grid; grid-template-columns:repeat(4,1fr); gap:16px}
+    .metric{border:1px solid var(--line); border-radius:16px; padding:18px; text-align:center; background:#fff}
+    .metric b{font-size:34px}
+    .spark{height:50px}
+
+    /* --- Pricing --- */
+    .pricing{display:grid; grid-template-columns:1fr 1fr; gap:18px}
+    .price{border:1px solid var(--line); border-radius:20px; padding:22px; background:#fff; position:relative}
+    .price h3{margin:0 0 6px}
+    .price .amount{font-size:34px; font-weight:800}
+    .pill{display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border:1px solid var(--line); border-radius:999px; font-size:12px; color:var(--muted)}
+
+    /* --- CTA band --- */
+    .band{margin:48px 0; padding:24px; border:1px solid var(--line); border-radius:22px; background:linear-gradient(180deg,#fff, #f9fafb)}
+    .band .row{display:flex; flex-wrap:wrap; align-items:center; gap:16px; justify-content:space-between}
+    .band .row p{margin:0}
+
+    /* --- Footer --- */
+    footer{padding:60px 0 30px; border-top:1px solid var(--line); color:var(--muted)}
+
+    /* --- Buttons --- */
+    .btn{display:inline-flex; align-items:center; gap:10px; padding:14px 18px; border:1px solid #111; border-radius:999px; font-weight:700; background:#fff; transition: background-color 0.35s ease}
+    .btn:hover{background-color: var(--ink);
+                color: #fff;}
+    .btn.secondary{border-color:#d1d5db; color:#111}
+    .btn:hover{color: #fff;}
+
+    /* --- Contact form (minimal) --- */
+    #kontakt form.card{padding:16px 0;border:0;background:transparent}
+    #kontakt .container{width:min(880px,92vw)}
+    .form-grid{display:grid;grid-template-columns:1fr;gap:16px}
+    @media (min-width:720px){.form-grid{grid-template-columns:1fr 1fr}}
+    .row-span-2{grid-column:1/-1}
+
+    .field{display:flex;flex-direction:column;gap:6px}
+    .field label{font-size:12px;color:var(--muted)}
+    .input{width:100%;padding:10px 0;border:none;border-bottom:1px solid var(--line);background:transparent;font:inherit}
+    .input:focus{outline:none;border-bottom-color:#111;box-shadow:0 6px 0 -5px rgba(0,0,0,.06)}
+    textarea.input{min-height:120px;resize:vertical}
+
+    #kontakt .btn{width:100%}
+    .form-note{margin-top:10px;font-size:14px;color:var(--muted)}
+    .form-note[data-variant="error"]{color:#b91c1c}
+    .form-note[data-variant="success"]{color:#047857}
+
+    /* --- Scroll reveal --- */
+    [data-reveal]{opacity:0; transform:translateY(18px); transition:opacity .6s ease, transform .6s ease}
+    [data-reveal].visible{opacity:1; transform:none}
+
+    /* --- Responsive --- */
+    @media (max-width: 980px){
+      .hero-grid{grid-template-columns:1fr; gap:20px}
+      .grid-3{grid-template-columns:1fr 1fr}
+      .steps{grid-template-columns:1fr 1fr}
+      .metrics{grid-template-columns:1fr 1fr}
+      .pricing{grid-template-columns:1fr}
+    }
+    @media (max-width:680px){
+      .grid-3{grid-template-columns:1fr}
+      .steps{grid-template-columns:1fr}
+      .metrics{grid-template-columns:1fr}
+    }
+
+    /* === Hamburger + mobilmeny === */
+.nav .inner{position:relative}
+.hamburger{display:none; position:absolute; right:0; top:51%; transform:translateY(-50%);
+  width:38px;height:38px;border:1px solid var(--line);border-radius:10px;background:#fff;cursor:pointer}
+.hamburger span{display:block;width:18px;height:2px;background:#111;margin:5px auto;transition:transform .2s,opacity .2s}
+
+/* Drawer */
+.scrim{position:fixed; inset:0; background:rgba(0,0,0,.32); backdrop-filter:blur(5px); opacity:0; pointer-events:none; transition:opacity .4s ease; z-index:70}
+.drawer{position:fixed; right:0; top:0; height:100dvh; width:min(86vw,360px); background:#fff; border-left:1px solid var(--line);
+  transform:translateX(100%); transition:transform .25s ease; z-index:80; display:flex; flex-direction:column; padding:16px}
+.drawer-header{display:flex; align-items:center; gap:10px; padding-bottom:10px; border-bottom:1px solid var(--line)}
+.drawer-header .brand-badge{width:28px;height:28px;display:grid;place-items:center;border:1px solid #111;border-radius:8px;font-weight:700}
+.drawer-header .close{margin-left:auto; border:1px solid var(--line); background:#fff; border-radius:8px; padding:6px 10px; cursor:pointer}
+.drawer-nav{display:flex; flex-direction:column; gap:6px; padding:14px 0}
+.drawer-nav a{padding:12px 10px; border-radius:12px}
+.drawer-nav a:hover{background:#f3f4f6}
+.drawer-nav .cta{margin-top:6px; text-align:center}
+.drawer-lang{margin-top:auto; display:flex; gap:8px}
+.drawer-lang button{appearance:none; border:1px solid var(--line); background:#fff; padding:10px 12px; border-radius:999px; font-weight:600; cursor:pointer}
+.drawer-lang button[aria-pressed="true"]{border-color:#111; box-shadow:var(--shadow)}
+
+/* Open state */
+body.menu-open .drawer{transform:none}
+body.menu-open .scrim{opacity:1; pointer-events:auto}
+body.menu-open{overflow:hidden}
+
+/* Desktop vs mobil */
+@media (max-width:900px){
+  .desktop-nav, .desktop-lang{display:none}
+  .hamburger{display:block}
+  /* Centrera brand på mobil */
+  .brand{margin:0 auto}
+}
+
+/* === Headline responsiveness + centering on small === */
+.title{
+  /* lite mindre på små skärmar, tajtare radavstånd */
+  font-size: clamp(28px, 7.5vw, 58px);
+  line-height: 1.12;
+  letter-spacing: -.015em;
+  text-wrap: balance;           /* modern browsers */
+  hyphens: auto;
+}
+
+h2{
+  font-size: clamp(22px, 5.5vw, 40px);
+  line-height: 1.15;
+  letter-spacing: -.01em;
+  text-wrap: balance;
+  hyphens: auto;
+}
+
+/* Tablet & mindre: centrera rubriker och “hero”-innehåll */
+@media (max-width: 900px){
+  .hero{ padding: 50px 0 60px; }
+  .hero-grid{ grid-template-columns: 1fr; gap: 16px; }
+  .kicker{ margin: 0 auto; }
+  .lead{ font-size: clamp(15px, 3.8vw, 18px); }
+
+  /* centrera rubriker + ingress + knappar */
+  .title,
+  .lead,
+  .section-head,
+  .section-head h2{
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* centrera “tags” och CTA-bandets innehåll */
+  .tags{ justify-content: center; }
+  .band .row{ justify-content: center; text-align: center; gap: 12px; }
+}
+
+/* Små telefoner: ytterligare nedskalning så rubriker inte blir 3–4 rader */
+@media (max-width: 520px){
+  .title{ font-size: clamp(24px, 8.8vw, 32px); line-height: 1.12; }
+  h2{ font-size: clamp(20px, 6.8vw, 26px); }
+  .kicker{ font-size: 11px; padding: 6px 10px; }
+  .tag{ font-size: 11px; padding: 6px 10px; }
+  .hero-card{ padding: 16px; }
+  section{ padding: 64px 0; }
+  .section-head{ margin-bottom: 24px; align-items: center; }
+}
+
+/* --- Fix: rubriker & ingress i sektioner på mobil --- */
+@media (max-width: 720px){
+  .section-head{
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+
+  .section-head h2{
+    font-size: clamp(22px, 6vw, 28px);
+    line-height: 1.15;
+    letter-spacing: -.01em;
+    max-width: 20ch;      /* styr till ~1–2 rader */
+    margin: 0 auto;
+    text-wrap: balance;   /* snyggare radbrytning (stöd varierar) */
+  }
+
+  .section-head p,
+  .section-head .muted{
+    font-size: clamp(14px, 4.2vw, 15px);
+    line-height: 1.45;
+    max-width: 36ch;      /* 2 rader istället för 3–4 */
+    margin: 0 auto;
+  }
+}
+
+/* Lite tajtare även på mellan-storlek */
+@media (min-width: 721px) and (max-width: 980px){
+  .section-head h2{ font-size: clamp(24px, 3.2vw, 32px); }
+  .section-head p,
+  .section-head .muted{ max-width: 52ch; }
+}
+
+/* === ABOUT XL === */
+.about-xl{
+  padding: 120px 0 110px;
+  background: linear-gradient(180deg, #fff 0%, #fafafa 100%);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.about-head{
+  max-width: 900px;
+  margin: 0 auto 40px;
+  text-align: center;
+}
+.about-kicker{
+  display:inline-block;
+  padding:8px 12px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  font-size:12px;
+  color:var(--muted);
+}
+.about-title{
+  font-size: clamp(32px, 5vw, 54px);
+  line-height: 1.06;
+  letter-spacing: -.02em;
+  margin: 12px 0 10px;
+}
+.about-lead{
+  font-size: clamp(16px, 2.2vw, 20px);
+  color:#111; opacity:.9;
+  max-width: 72ch;
+  margin: 0 auto;
+}
+
+/* Manifesto grid (varierad textposition genom CSS grid) */
+.about-manifesto{
+  display:grid;
+  grid-template-columns: 1.1fr .9fr;
+  gap: 18px;
+  margin: 46px 0 18px;
+}
+.about-manifesto .block{
+  border:1px solid var(--line);
+  border-radius: 18px;
+  padding: 18px 18px 16px;
+  background:#fff;
+}
+.about-manifesto h3{
+  margin:0 0 6px; font-size:20px; letter-spacing:-.01em;
+}
+.about-manifesto p{ margin:0; color:#111; opacity:.9 }
+.about-manifesto .check{ margin:8px 0 0 18px; }
+.about-manifesto .check li{ margin:6px 0; }
+
+/* Pillars (tre axlar) */
+.about-pillars{
+  display:grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 14px;
+  margin: 18px 0 22px;
+}
+.pillar{
+  border:1px solid var(--line);
+  border-radius: 18px;
+  background:#fff;
+  padding: 18px;
+}
+.pillar .num{
+  width:36px;height:36px;border:1px solid #111;border-radius:10px;
+  display:grid;place-items:center;font-weight:800;margin-bottom:8px;
+}
+.pillar h4{ margin:0 0 6px; font-size:18px }
+.pillar p{ margin:0; color:#111; opacity:.9 }
+
+/* Pull-quote */
+.about-quote{
+  margin: 34px auto 10px;
+  max-width: 900px;
+  padding: 22px 0;
+  text-align:center;
+}
+.about-quote p{
+  font-size: clamp(20px, 3.6vw, 30px);
+  letter-spacing:-.01em;
+}
+
+/* Micro-merits */
+.about-metas{
+  display:grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 12px;
+  margin: 16px 0 32px;
+}
+.meta{
+  border:1px solid var(--line);
+  border-radius: 16px;
+  background:#fff;
+  padding: 14px 16px;
+  text-align:center;
+}
+.meta b{ display:block; font-size:16px; }
+.meta span{ color:var(--muted); font-size:13px; }
+
+/* CTA */
+.about-cta{
+  border:1px solid var(--line);
+  border-radius: 22px;
+  background: linear-gradient(180deg,#fff, #f9fafb);
+  padding: 24px;
+  display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;
+}
+.about-cta p{ margin:0; font-weight:500; }
+
+/* Responsivt */
+@media (max-width: 980px){
+  .about-manifesto{ grid-template-columns:1fr; }
+  .about-pillars{ grid-template-columns:1fr 1fr; }
+  .about-metas{ grid-template-columns:1fr 1fr; }
+}
+@media (max-width: 620px){
+  .about-xl{ padding: 96px 0 90px; }
+  .about-pillars{ grid-template-columns:1fr; }
+  .about-metas{ grid-template-columns:1fr; }
+}
+
+
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+  <header class="nav">
+  <div class="container inner">
+      <!-- Hamburger (mobil) -->
+      <button class="hamburger" id="menuBtn" aria-label="Öppna meny" aria-expanded="false">
+        <svg
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <path
+    d="M2 8C2 7.44772 2.44772 7 3 7H21C21.5523 7 22 7.44772 22 8C22 8.55228 21.5523 9 21 9H3C2.44772 9 2 8.55228 2 8Z"
+    fill="currentColor"
+  />
+  <path
+    d="M2 12C2 11.4477 2.44772 11 3 11H21C21.5523 11 22 11.4477 22 12C22 12.5523 21.5523 13 21 13H3C2.44772 13 2 12.5523 2 12Z"
+    fill="currentColor"
+  />
+  <path
+    d="M3 15C2.44772 15 2 15.4477 2 16C2 16.5523 2.44772 17 3 17H15C15.5523 17 16 16.5523 16 16C16 15.4477 15.5523 15 15 15H3Z"
+    fill="currentColor"
+  />
+        </svg>
+      </button>
+
+    <!-- Varumärke -->
+    <a href="#top" class="brand">
+      <span class="brand-badge">SL</span>
+      <span>ScaleLab</span>
+    </a>
+
+    <!-- Desktop-nav -->
+    <nav class="desktop-nav">
+      <a id="nav-cases" href="#cases">Case</a>
+      <a id="nav-services" href="#tjanster">Tjänster</a>
+      <a id="nav-process" href="#process">Process</a>
+      <a id="nav-pricing" href="#priser">Priser</a>
+      <a id="nav-cta" href="#kontakt" class="cta">Boka intro</a>
+    </nav>
+
+    <!-- Språk (desktop) -->
+    <div class="lang desktop-lang" aria-label="Language switch">
+      <button id="lang-sv" aria-pressed="true">SV</button>
+      <button id="lang-en" aria-pressed="false">EN</button>
+    </div>
+  </div>
+
+
+</header>
+
+  <!-- Mobil: Slide-in panel + scrim -->
+  <div class="scrim" id="scrim" hidden></div>
+  <aside class="drawer" id="drawer" aria-hidden="true">
+    <div class="drawer-header">
+      <span class="brand-badge">SL</span><strong>ScaleLab</strong>
+      <button class="close" id="closeDrawer" aria-label="Stäng meny">✕</button>
+    </div>
+    <nav class="drawer-nav">
+      <a id="m-cases" href="#cases">Case</a>
+      <a id="m-services" href="#tjanster">Tjänster</a>
+      <a id="m-process" href="#process">Process</a>
+      <a id="m-pricing" href="#priser">Priser</a>
+      <a id="m-cta" href="#kontakt" class="cta">Boka intro</a>
+    </nav>
+    <div class="drawer-lang">
+      <button id="m-lang-sv" aria-pressed="true">SV</button>
+      <button id="m-lang-en" aria-pressed="false">EN</button>
+    </div>
+  </aside>
+
+
+  <main id="top">
+    <!-- Hero -->
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <span class="kicker" data-reveal id="hero-kicker">Freelance Brand Scaling • Ads • Landningssidor • Data</span>
+          <h1 class="title" data-reveal id="hero-title">Vi skalar varumärken — snabbt, enkelt och mätbart.</h1>
+          <p class="lead" data-reveal id="hero-lead">Vi bygger och itererar kreativa annonser, optimerar landningssidor och skruvar på flöden tills ROAS sitter. Minimal byråsnack — maximal effekt.</p>
+          <div class="tags" data-reveal>
+            <span class="tag" id="tag-ads">Meta & TikTok Ads</span>
+            <span class="tag" id="tag-ugc">UGC & Scripts</span>
+            <span class="tag" id="tag-cro">CRO & A/B</span>
+            <span class="tag" id="tag-niches">E‑handel & Leadgen</span>
+          </div>
+          <div style="margin-top:25px" data-reveal>
+            <a href="#kontakt" class="btn" id="btn-start">Starta gratis konsultation</a>
+            <a style="margin-top:10px" style href="#cases" class="btn secondary" id="btn-cases">Se case</a>
+          </div>
+        </div>
+        <aside class="hero-card" aria-label="Snabba fakta" data-reveal>
+          <div class="stat"><div><small id="stat-1">Genomsnittlig första 60 dagar</small></div><b>+43% ROAS</b></div>
+          <div class="stat"><div><small id="stat-2">Ökad checkout-konvertering</small></div><b>+28%</b></div>
+          <div class="stat"><div><small id="stat-3">Genomsnittlig annons‑CPA</small></div><b>−22%</b></div>
+          <div class="tags"><span class="pill" id="pill-1">Transparent rapportering</span><span class="pill" id="pill-2">Ingen bindning</span><span class="pill" id="pill-3">Snabb iteration</span></div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- Logos marquee -->
+    <div class="marquee" aria-label="Varumärken vi jobbat med" id="marquee-label">
+      <div class="track">
+        <img class="logo" alt="Client" src="img/openai.png"/>
+        <img class="logo" alt="Client" src="img/oscar.jpg"/>
+        <img class="logo" alt="Client" src="img/openai.png"/>
+        <img class="logo" alt="Client" src="img/oscar.jpg"/>
+        <img class="logo" alt="Client" src="img/openai.png"/>
+        <!-- duplicate for infinite scroll -->
+        <img class="logo" alt="Client" src="img/openai.png"/>
+        <img class="logo" alt="Client" src="img/oscar.jpg"/>
+        <img class="logo" alt="Client" src="img/openai.png"/>
+        <img class="logo" alt="Client" src="img/oscar.jpg"/>
+        <img class="logo" alt="Client" src="img/openai.png"/>
+      </div>
+    </div>
+
+    <!-- Cases -->
+    <section id="cases">
+      <div class="container">
+        <div class="section-head">
+          <h2 data-reveal id="cases-title">Resultat & Case</h2>
+          <p class="muted" data-reveal id="cases-desc">Korta sammanfattningar. Rakt på sak. Alla siffror är mätta efter minst 30 dagars körning med tydligt spårade mål.</p>
+        </div>
+        <div class="grid-3">
+          <article class="card" data-reveal>
+            <div class="thumb">
+              <img alt="E‑handel case" src="img/ecomm.jpg"/>
+            </div>
+            <h3 id="case1-title">E‑handel — Skincare</h3>
+            <p id="case1-text"><b>+57% ROAS</b> på 45 dagar via UGC‑scripts, 3 kreativa koncept och snabb landningssida (0.9s LCP).</p>
+          </article>
+          <article class="card" data-reveal>
+            <div class="thumb">
+              <img alt="Leadgen case" src="img/leadgen.jpg"/>
+            </div>
+            <h3 id="case2-title">B2B Leadgen — SaaS</h3>
+            <p id="case2-text"><b>−34% CPA</b> och <b>+2.1x</b> demo‑bokningar med ny offerstruktur och tydlig risk‑reversal.</p>
+          </article>
+          <article class="card" data-reveal>
+            <div class="thumb">
+              <img alt="DTC case" src="img/dtc.jpg"/>
+            </div>
+            <h3 id="case3-title">DTC — Apparel</h3>
+            <p id="case3-text"><b>+31% konvertering</b> efter A/B på PDP, nytt social proof‑block och förbättrade kreativa hooks.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tjänster -->
+    <section id="tjanster">
+      <div class="container">
+        <div class="section-head">
+          <h2 data-reveal id="services-title">Tjänster</h2>
+          <p class="muted" data-reveal id="services-desc">Vi kör sprintar om 2 veckor: hypotes → produktion → test → lärdomar → nästa iteration. Alltid transparent och enkelt.</p>
+        </div>
+        <div class="grid-3">
+          <article class="card" data-reveal>
+            <h3 id="svc1-title">Kreativ produktion</h3>
+            <p id="svc1-text">UGC‑scripts, storyboard, hook‑testning, snabba iterationer. Format för Reels, TikTok, Shorts, Stories.</p>
+          </article>
+          <article class="card" data-reveal>
+            <h3 id="svc2-title">Paid Social</h3>
+            <p id="svc2-text">Kontostruktur, pixel & events, budgetpacing, kreativa tester, målgrupper, retargeting och skalning.</p>
+          </article>
+          <article class="card" data-reveal>
+            <h3 id="svc3-title">CRO & Landningssidor</h3>
+            <p id="svc3-text">Hypotesdrivna A/B‑test, snabb UI, social proof, risk‑reversal, prissättning och friktion bort.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Process -->
+    <section id="process">
+      <div class="container">
+        <div class="section-head">
+          <h2 data-reveal id="process-title">Så här jobbar vi</h2>
+          <p class="muted" data-reveal id="process-desc">Strömlinjeformat och tydligt. Ni får alltid en enkel plan och siffror som går att följa.</p>
+        </div>
+        <div class="steps">
+          <div class="step" data-reveal>
+            <div class="num">1</div>
+            <h3 id="p1">Kickoff</h3>
+            <p id="p1t">20 min genomgång. Nuläge, mål, hinder. Tillgångar sätts upp.</p>
+          </div>
+          <div class="step" data-reveal>
+            <div class="num">2</div>
+            <h3 id="p2">Hypotes</h3>
+            <p id="p2t">Vi formulerar 3–5 testbara hypoteser för kreativa och funnel.</p>
+          </div>
+          <div class="step" data-reveal>
+            <div class="num">3</div>
+            <h3 id="p3">Produktion</h3>
+            <p id="p3t">Snabb kreationsrunda (UGC/script/klipp) + landningsblock.</p>
+          </div>
+          <div class="step" data-reveal>
+            <div class="num">4</div>
+            <h3 id="p4">Skalning</h3>
+            <p id="p4t">Optimera, A/B, budgetpacing. Veckorapport med lärdomar.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Metrics + tiny sparkline canvases -->
+    <section>
+      <div class="container">
+        <div class="section-head">
+          <h2 data-reveal id="metrics-title">Vad vi brukar se</h2>
+          <p class="muted" data-reveal id="metrics-desc">Resultat varierar — men mönstren återkommer när vi fokuserar på rätt saker, i rätt ordning.</p>
+        </div>
+        <div class="metrics">
+          <div class="metric" data-reveal>
+            <b id="m1">+20–60%</b>
+            <div id="m1t">ROAS på 30–60 dagar</div>
+            <canvas class="spark" data-points="2,5,4,7,8,12,14"></canvas>
+          </div>
+          <div class="metric" data-reveal>
+            <b id="m2">−15–40%</b>
+            <div id="m2t">CPA efter kreativa tester</div>
+            <canvas class="spark" data-points="14,13,12,11,10,9,8"></canvas>
+          </div>
+          <div class="metric" data-reveal>
+            <b id="m3">+10–35%</b>
+            <div id="m3t">Konvertering via CRO</div>
+            <canvas class="spark" data-points="3,3,4,5,6,6,7"></canvas>
+          </div>
+          <div class="metric" data-reveal>
+            <b id="m4">+2–5x</b>
+            <div id="m4t">Engagemang på rätt hook</div>
+            <canvas class="spark" data-points="1,2,1,3,4,5,5"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Priser -->
+    <section id="priser">
+      <div class="container">
+        <div class="section-head">
+          <h2 data-reveal id="pricing-title">Prismodell</h2>
+          <p class="muted" data-reveal id="pricing-desc">Enkel och prestationsbaserad. Ingen bindningstid. Vi börjar gärna med en testmånad.</p>
+        </div>
+        <div class="pricing">
+          <div class="price" data-reveal>
+            <span class="pill" id="price1-pill">Starta</span>
+            <h3 id="price1-title">Growth Sprint (2 veckor)</h3>
+            <div class="amount" id="price1-amount">9 000 kr</div>
+            <p id="price1-text">1 sprint med hypotes → kreativ produktion → test → rapport. Passar för att komma igång snabbt.</p>
+            <ul id="price1-list">
+              <li>3–5 kreativa varianter</li>
+              <li>1 landningsblock/CRO‑test</li>
+              <li>Setup & spårning</li>
+            </ul>
+          </div>
+          <div class="price" data-reveal>
+            <span class="pill" id="price2-pill">Skala</span>
+            <h3 id="price2-title">Retention + Rev‑Share</h3>
+            <div class="amount" id="price2-amount">4 500 kr/mån + 10%</div>
+            <p id="price2-text">Löpande iteration och skalning. Fast lågt arvode + procent av den mätbara ökningen.</p>
+            <ul id="price2-list">
+              <li>Veckotester & rapport</li>
+              <li>Kontinuerlig CRO</li>
+              <li>Skalningsstrategi</li>
+            </ul>
+          </div>
+        </div>
+        <div class="band" data-reveal>
+          <div class="row">
+            <p id="band-text"><b>Osäker på var ni ska börja?</b> Vi gör en gratis 20‑min genomgång av konton och landningssidor.</p>
+            <a href="#kontakt" class="btn" id="band-btn">Boka en genomgång</a>
+          </div>
+        </div>
+      </div>
+    </section>
+    
+    <!-- ABOUT / OM OSS -->
+<section class="about-xl" id="about">
+  <div class="container">
+
+    <div class="about-head" data-reveal>
+      <span class="about-kicker">Vilka vi är</span>
+      <h2 class="about-title">Två unga grundare. Senior leverans.</h2>
+      <p class="about-lead">
+        Vi är <b>Linus Rosenqvist</b> och <b>Kevin Björnerhag</b> – i 20-årsåldern men med erfarenhet och spetskompetens som ofta överträffar byråer med långt fler år på nacken. Vi kombinerar teknisk precision, kreativ design och affärsdriven marknadsföring för att skala varumärken snabbt och mätbart.
+      </p>
+    </div>
+
+    <!-- Manifesto / bullets -->
+    <div class="about-manifesto" data-reveal>
+      <div class="block">
+        <h3>Varför ScaleLab?</h3>
+        <p>Vi jobbar sprintbaserat, rakt på sak och med tydliga KPI:er. Mindre snack, mer test → lärdom → skalning.</p>
+      </div>
+      <div class="block">
+        <h3>Vad vi tror på</h3>
+        <ul class="check">
+          <li>Hypoteser före åsikter</li>
+          <li>Kreativitet som driver CPA nedåt</li>
+          <li>Snabb iteration slår “perfekt”</li>
+        </ul>
+      </div>
+
+      <!-- Linus -->
+      <div class="block">
+        <h3>Linus — Teknisk och kreativ motor</h3>
+        <p>
+          Utbildad systemutvecklare (2 år) med spets inom <b>HTML, CSS och JavaScript</b>. Har utvecklat avancerade webbplatser, skräddarsydda system och designlösningar för både sitt eget UF-företag och flera egna projekt. 
+        </p>
+        <p>
+          Med 5+ års erfarenhet av Adobe Creative Cloud (Photoshop, After Effects, Premiere Pro, Lightroom, Illustrator) kombinerar Linus visuellt stark design med teknisk precision för att skapa lösningar som både ser fantastiska ut och presterar på hög nivå.
+        </p>
+        <p>
+          Hans styrka ligger i att snabbt förstå både den kreativa och tekniska sidan av en kampanj – och få dem att samspela för att leverera resultat som överträffar förväntningarna.
+        </p>
+      </div>
+
+      <!-- Kevin -->
+      <div class="block">
+        <h3>Kevin — Säljstrateg & kommersiell kraft</h3>
+        <p>
+          En resultatorienterad “deal closer” med naturlig fingertoppskänsla för affärer. Har drivit ett marknadsförings-UF med nöjda kunder och imponerande tillväxt, samt arbetat professionellt inom försäljning med dokumenterade toppresultat.
+        </p>
+        <p>
+          Kevin är expert på att snabbt identifiera kundens verkliga behov, paketera lösningen och leda dem hela vägen till affär.
+        </p>
+        <p>
+          Med bakgrund inom grafisk design och stark känsla för varumärkespositionering ser han till att varje kampanj inte bara säljer, utan stärker hela varumärkets närvaro.
+        </p>
+      </div>
+    </div>
+
+    <!-- ”Vi levererar på tre axlar” -->
+    <div class="about-pillars" data-reveal>
+      <div class="pillar">
+        <div class="num">01</div>
+        <h4>Kreativ produktion</h4>
+        <p>UGC, hooks, scripts och format som plockar uppmärksamhet och håller den tills klicket sker.</p>
+      </div>
+      <div class="pillar">
+        <div class="num">02</div>
+        <h4>Paid social & skalning</h4>
+        <p>Kontostruktur, budgetpacing, målgrupper och A/B som pressar CPA och driver ROAS.</p>
+      </div>
+      <div class="pillar">
+        <div class="num">03</div>
+        <h4>CRO & landningsblock</h4>
+        <p>Snabba block, social proof, risk-reversal och friktionsjakter som lyfter konvertering.</p>
+      </div>
+    </div>
+
+    <!-- Stor quote -->
+    <blockquote class="about-quote" data-reveal>
+      <p>“Unga nog att testa allt — erfarna nog att veta <i>vad</i> som är värt att skala.”</p>
+    </blockquote>
+
+    <!-- Merits -->
+    <div class="about-metas" data-reveal>
+      <div class="meta"><b>0 kr bindning</b><span>prestationsdrivet upplägg</span></div>
+      <div class="meta"><b>2-veckors sprintar</b><span>tydliga leverabler</span></div>
+      <div class="meta"><b>Transparens</b><span>enkel dashboard & rapport</span></div>
+      <div class="meta"><b>Snabb start</b><span>setup & spårning direkt</span></div>
+    </div>
+
+    <!-- CTA -->
+    <div class="about-cta" data-reveal>
+      <p>Vill ni veta om vi är rätt fit? Vi gör en gratis 20-min genomgång av konto & landningssidor.</p>
+      <a href="#kontakt" class="btn">Boka intro</a>
+    </div>
+
+  </div>
+</section>
+
+
+
+    <!-- FAQ -->
+    <section>
+      <div class="container">
+        <div class="section-head">
+          <h2 data-reveal id="faq-title">Vanliga frågor</h2>
+          <p class="muted" data-reveal id="faq-desc">Korta svar på det vi oftast får.</p>
+        </div>
+        <div class="grid-3">
+          <article class="card" data-reveal>
+            <h3 id="faq1-q">Hur snabbt ser vi resultat?</h3>
+            <p id="faq1-a">Första tydliga signaler inom 2–4 veckor. Full effekt syns oftast efter 6–10 veckor.</p>
+          </article>
+          <article class="card" data-reveal>
+            <h3 id="faq2-q">Vilka plattformar kör ni?</h3>
+            <p id="faq2-a">Meta, TikTok, Google (PMAX/Shopping/Brand). Vi anpassar efter mål och produkt.</p>
+          </article>
+          <article class="card" data-reveal>
+            <h3 id="faq3-q">Hur mäter ni?</h3>
+            <p id="faq3-a">Server‑side eller CAPI där det behövs, tydliga events och enkel dashboard per mål.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Kontakt (minimal) -->
+    <section id="kontakt">
+      <div class="container">
+        <div class="section-head">
+          <h2 data-reveal id="contact-title">Boka en intro</h2>
+          <p class="muted" data-reveal id="contact-desc">Skriv några rader så återkommer vi inom 24h. Minimal form, maximal tydlighet.</p>
+        </div>
+        <div class="grid-3">
+          <form class="card" data-reveal id="bookForm" novalidate>
+            <div class="form-grid">
+              <div class="field">
+                <label for="name" id="label-name">Namn</label>
+                <input class="input" id="name" name="name" placeholder="Ditt namn" required autocomplete="off">
+              </div>
+              <div class="field">
+                <label for="email" id="label-email">E‑post</label>
+                <input class="input" id="email" type="email" name="email" placeholder="namn@foretag.se" required autocomplete="off">
+              </div>
+              <div class="field row-span-2">
+                <label for="company" id="label-company">Företag (valfritt)</label>
+                <input class="input" id="company" name="company" placeholder="Företagsnamn" autocomplete="off">
+              </div>
+              <div class="field row-span-2">
+                <label for="message" id="label-message">Kort beskrivning</label>
+                <textarea class="input" id="message" name="message" placeholder="Vad vill ni uppnå?"></textarea>
+              </div>
+              <button class="btn row-span-2" type="submit" id="btn-submit">Skicka</button>
+            </div>
+            <p class="form-note" id="formNote">Vi återkommer inom 24h. Inget spam.</p>
+          </form>
+          <div class="card" data-reveal>
+            <h3 id="next-title">Vad händer sen?</h3>
+            <p id="next-text">Vi bokar 20 min, går igenom konton/landningssidor och föreslår en enkel plan för första sprinten.</p>
+            <ul id="next-list">
+              <li>0 kr, ingen bindning</li>
+              <li>Konkreta förslag</li>
+              <li>Tydliga KPI:er</li>
+            </ul>
+          </div>
+          <div class="card" data-reveal>
+            <h3 id="contact-card-title">Kontakt</h3>
+            <p id="contact-card-text">kontakt@scalelab.se<br>+46 70 000 00 00<br>Varberg, Sverige</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap">
+        <div>© <span id="year"></span> <span id="footer-brand">ScaleLab</span>. <span id="footer-rights">Alla rättigheter förbehållna.</span></div>
+        <div style="display:flex; gap:14px">
+          <a href="#top" id="footer-top">Till toppen</a>
+          <a href="#priser" id="footer-pricing">Priser</a>
+          <a href="#kontakt" id="footer-contact">Kontakt</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Scroll progress bar
+    const progress = document.getElementById('progress');
+    const onScroll = () => {
+      const h = document.documentElement;
+      const scrolled = h.scrollTop / (h.scrollHeight - h.clientHeight);
+      progress.style.transform = `scaleX(${scrolled})`;
+    };
+    document.addEventListener('scroll', onScroll, {passive:true});
+    onScroll();
+
+    // Reveal on view
+    const revealEls = document.querySelectorAll('[data-reveal]');
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('visible'); io.unobserve(e.target); } });
+    },{threshold:.14});
+    revealEls.forEach(el=>io.observe(el));
+
+    // Minimal sparkline charts
+// === Animated sparklines on reveal ===
+(function () {
+  const canvases = document.querySelectorAll('canvas.spark');
+
+  function animateSpark(c) {
+    const ctx = c.getContext('2d');
+    const points = c.dataset.points.split(',').map(Number);
+
+    // HiDPI / storlek
+    const w = c.width = c.offsetWidth * devicePixelRatio;
+    const h = c.height = c.offsetHeight * devicePixelRatio;
+    const pad = 8 * devicePixelRatio;
+
+    const min = Math.min(...points), max = Math.max(...points);
+    const scaleX = (i) => pad + (i * (w - 2 * pad) / (points.length - 1));
+    const scaleY = (v) => h - pad - ((v - min) / (Math.max(1e-6, max - min))) * (h - 2 * pad);
+
+    // Förbered koordinater (så vi slipper räkna varje frame)
+    const coords = points.map((v, i) => [scaleX(i), scaleY(v)]);
+    const segs = points.length - 1;
+
+    ctx.lineWidth = 2 * devicePixelRatio;
+    ctx.strokeStyle = '#111111';
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+
+    const duration = 1500; // ms
+    const start = performance.now();
+
+    function draw(now) {
+      const t = Math.min(1, (now - start) / duration);
+      // ease-out
+      const p = 1 - Math.pow(1 - t, 3);
+
+      // hur många segment ska vara synliga?
+      const total = segs * p;
+      const k = Math.floor(total);           // fulla segment
+      const frac = total - k;                // andel av nästa
+
+      ctx.clearRect(0, 0, w, h);
+      ctx.beginPath();
+
+      // startpunkt
+      ctx.moveTo(coords[0][0], coords[0][1]);
+
+      // rita fulla segment
+      for (let i = 0; i < k; i++) {
+        ctx.lineTo(coords[i + 1][0], coords[i + 1][1]);
+      }
+
+      // rita del av nästa segment
+      if (k < segs) {
+        const [x1, y1] = coords[k];
+        const [x2, y2] = coords[k + 1];
+        const x = x1 + (x2 - x1) * frac;
+        const y = y1 + (y2 - y1) * frac;
+        ctx.lineTo(x, y);
+      }
+
+      ctx.stroke();
+
+      if (t < 1) requestAnimationFrame(draw);
+    }
+
+    requestAnimationFrame(draw);
+  }
+
+  // Kör animationen när varje canvas blir synlig
+  const sparkIO = new IntersectionObserver((entries) => {
+    entries.forEach((e) => {
+      if (e.isIntersecting) {
+        animateSpark(e.target);
+        sparkIO.unobserve(e.target); // bara en gång
+      }
+    });
+  }, { threshold: 0.25 });
+
+  canvases.forEach((c) => sparkIO.observe(c));
+})();
+
+
+    // Contact form UX (minimal)
+    (function(){
+      const form = document.getElementById('bookForm');
+      const note = document.getElementById('formNote');
+      if(!form) return;
+      form.addEventListener('submit', (e)=>{
+        e.preventDefault();
+        const data = Object.fromEntries(new FormData(form).entries());
+        if(!data.name || !data.email){
+          note.textContent = currentLang==='sv' ? 'Fyll i namn och e‑post.' : 'Please fill in name and email.';
+          note.dataset.variant = 'error';
+          return;
+        }
+        note.textContent = currentLang==='sv' ? 'Tack! Vi hör av oss inom 24h.' : 'Thanks! We’ll get back within 24h.';
+        note.dataset.variant = 'success';
+        form.reset();
+      });
+    })();
+
+    // === Language switch ===
+    const i18n = {
+      sv: {
+        htmlLang: 'sv',
+        title: 'Scalelab.se',
+        desc: 'Vi skalar varumärken med smarta kreativa ads, konverterande landningssidor och datadriven iterering.',
+        nav: {cases:'Case', services:'Tjänster', process:'Process', pricing:'Priser', cta:'Boka intro'},
+        hero: {
+          kicker:'Freelance Brand Scaling • Ads • Landningssidor • Data',
+          title:'Vi skalar varumärken — snabbt, enkelt och mätbart.',
+          lead:'Vi bygger och itererar kreativa annonser, optimerar landningssidor och skruvar på flöden tills ROAS sitter. Minimal byråsnack — maximal effekt.',
+          tags:{ads:'Meta & TikTok Ads', ugc:'UGC & Scripts', cro:'CRO & A/B', niches:'E‑handel & Leadgen'},
+          btnStart:'Starta gratis konsultation', btnCases:'Se case',
+          stats:['Genomsnittlig första 60 dagar','Ökad checkout-konvertering','Genomsnittlig annons‑CPA'],
+          pills:['Transparent rapportering','Ingen bindning','Snabb iteration']
+        },
+        marquee:'Varumärken vi jobbat med',
+        cases:{title:'Resultat & Case', desc:'Korta sammanfattningar. Rakt på sak. Alla siffror är mätta efter minst 30 dagars körning med tydligt spårade mål.',
+          c1:{title:'E‑handel — Skincare', text:'<b>+57% ROAS</b> på 45 dagar via UGC‑scripts, 3 kreativa koncept och snabb landningssida (0.9s LCP).'},
+          c2:{title:'B2B Leadgen — SaaS', text:'<b>−34% CPA</b> och <b>+2.1x</b> demo‑bokningar med ny offerstruktur och tydlig risk‑reversal.'},
+          c3:{title:'DTC — Apparel', text:'<b>+31% konvertering</b> efter A/B på PDP, nytt social proof‑block och förbättrade kreativa hooks.'}
+        },
+        services:{title:'Tjänster', desc:'Vi kör sprintar om 2 veckor: hypotes → produktion → test → lärdomar → nästa iteration. Alltid transparent och enkelt.',
+          s1:{title:'Kreativ produktion', text:'UGC‑scripts, storyboard, hook‑testning, snabba iterationer. Format för Reels, TikTok, Shorts, Stories.'},
+          s2:{title:'Paid Social', text:'Kontostruktur, pixel & events, budgetpacing, kreativa tester, målgrupper, retargeting och skalning.'},
+          s3:{title:'CRO & Landningssidor', text:'Hypotesdrivna A/B‑test, snabb UI, social proof, risk‑reversal, prissättning och friktion bort.'}
+        },
+        process:{title:'Så här jobbar vi', desc:'Strömlinjeformat och tydligt. Ni får alltid en enkel plan och siffror som går att följa.',
+          p1:{t:'Kickoff', d:'30 min genomgång. Nuläge, mål, hinder. Tillgångar sätts upp.'},
+          p2:{t:'Hypotes', d:'Vi formulerar 3–5 testbara hypoteser för kreativa och funnel.'},
+          p3:{t:'Produktion', d:'Snabb kreationsrunda (UGC/script/klipp) + landningsblock.'},
+          p4:{t:'Skalning', d:'Optimera, A/B, budgetpacing. Veckorapport med lärdomar.'}
+        },
+        metrics:{title:'Vad vi brukar se', desc:'Resultat varierar — men mönstren återkommer när vi fokuserar på rätt saker, i rätt ordning.',
+          m1:'ROAS på 30–60 dagar', m2:'CPA efter kreativa tester', m3:'Konvertering via CRO', m4:'Engagemang på rätt hook'
+        },
+        pricing:{title:'Prismodell', desc:'Enkel och prestationsbaserad. Ingen bindningstid. Vi börjar gärna med en testmånad.',
+          p1:{pill:'Starta', title:'Growth Sprint (2 veckor)', amount:'9 000 kr', text:'1 sprint med hypotes → kreativ produktion → test → rapport. Passar för att komma igång snabbt.', list:['3–5 kreativa varianter','1 landningsblock/CRO‑test','Setup & spårning']},
+          p2:{pill:'Skala', title:'Retention + Rev‑Share', amount:'4 500 kr/mån + 10%', text:'Löpande iteration och skalning. Fast lågt arvode + procent av den mätbara ökningen.', list:['Veckotester & rapport','Kontinuerlig CRO','Skalningsstrategi']},
+          band:{text:'<b>Osäker på var ni ska börja?</b> Vi gör en gratis 20‑min genomgång av konton och landningssidor.', btn:'Boka en genomgång'}
+        },
+        faq:{title:'Vanliga frågor', desc:'Korta svar på det vi oftast får.',
+          q1:{q:'Hur snabbt ser vi resultat?', a:'Första tydliga signaler inom 2–4 veckor. Full effekt syns oftast efter 6–10 veckor.'},
+          q2:{q:'Vilka plattformar kör ni?', a:'Meta, TikTok, Google (PMAX/Shopping/Brand). Vi anpassar efter mål och produkt.'},
+          q3:{q:'Hur mäter ni?', a:'Server‑side eller CAPI där det behövs, tydliga events och enkel dashboard per mål.'}
+        },
+        contact:{title:'Boka en intro', desc:'Skriv några rader så återkommer vi inom 24h. Minimal form, maximal tydlighet.',
+          labels:{name:'Namn', email:'E‑post', company:'Företag (valfritt)', message:'Kort beskrivning'},
+          placeholders:{name:'Ditt namn', email:'namn@foretag.se', company:'Företagsnamn', message:'Vad vill ni uppnå?'},
+          submit:'Skicka', note:'Vi återkommer inom 24h. Inget spam.',
+          next:{title:'Vad händer sen?', text:'Vi bokar 20 min, går igenom konton/landningssidor och föreslår en enkel plan för första sprinten.', list:['0 kr, ingen bindning','Konkreta förslag','Tydliga KPI:er']},
+          cardTitle:'Kontakt', cardText:'kontakt@scalelab.se<br>+46 70 000 00 00<br>Varberg, Sverige'
+        },
+        footer:{top:'Till toppen', pricing:'Priser', contact:'Kontakt', rights:'Alla rättigheter förbehållna.'}
+      },
+      en: {
+        htmlLang: 'en',
+        title: 'ScaleLab — Freelance Brand Scaling',
+        desc: 'We scale brands with smart creative ads, high‑converting landing pages, and data‑driven iteration.',
+        nav: {cases:'Cases', services:'Services', process:'Process', pricing:'Pricing', cta:'Book intro'},
+        hero: {
+          kicker:'Freelance Brand Scaling • Ads • Landing pages • Data',
+          title:'We scale brands — fast, simple and measurable.',
+          lead:'We build and iterate creatives, optimize landing pages, and tune funnels until ROAS sticks. Minimal agency fluff — maximum impact.',
+          tags:{ads:'Meta & TikTok Ads', ugc:'UGC & Scripts', cro:'CRO & A/B', niches:'E‑com & Leadgen'},
+          btnStart:'Start a free review', btnCases:'See cases',
+          stats:['Avg. improvement first 60 days','Increased checkout conversion','Average ads CPA'],
+          pills:['Transparent reporting','No lock‑in','Fast iteration']
+        },
+        marquee:'Brands we’ve worked with',
+        cases:{title:'Results & Cases', desc:'Short summaries. Straight to the point. All numbers measured after at least 30 days with clearly tracked goals.',
+          c1:{title:'E‑commerce — Skincare', text:'<b>+57% ROAS</b> in 45 days via UGC scripts, 3 creative concepts and a fast landing page (0.9s LCP).'},
+          c2:{title:'B2B Leadgen — SaaS', text:'<b>−34% CPA</b> and <b>+2.1x</b> demo bookings with a new offer structure and a clear risk reversal.'},
+          c3:{title:'DTC — Apparel', text:'<b>+31% conversion</b> after PDP A/B, new social proof block and stronger creative hooks.'}
+        },
+        services:{title:'Services', desc:'We work in 2‑week sprints: hypothesis → production → test → learnings → next iteration. Always transparent and simple.',
+          s1:{title:'Creative production', text:'UGC scripts, storyboards, hook testing, rapid iterations. Formats for Reels, TikTok, Shorts, Stories.'},
+          s2:{title:'Paid Social', text:'Account structure, pixel & events, budget pacing, creative tests, audiences, retargeting and scaling.'},
+          s3:{title:'CRO & Landing pages', text:'Hypothesis‑driven A/B tests, fast UI, social proof, risk reversal, pricing and friction removal.'}
+        },
+        process:{title:'How we work', desc:'Streamlined and clear. You always get a simple plan and numbers you can follow.',
+          p1:{t:'Kickoff', d:'30 min review. Current state, goals, blockers. Assets connected.'},
+          p2:{t:'Hypothesis', d:'We formulate 3–5 testable hypotheses for creative and funnel.'},
+          p3:{t:'Production', d:'Rapid creative round (UGC/script/edit) + landing blocks.'},
+          p4:{t:'Scaling', d:'Optimize, A/B, budget pacing. Weekly report with learnings.'}
+        },
+        metrics:{title:'What we typically see', desc:'Results vary — but patterns repeat when we focus on the right things in the right order.',
+          m1:'ROAS in 30–60 days', m2:'CPA after creative tests', m3:'Conversion via CRO', m4:'Engagement on the right hook'
+        },
+        pricing:{title:'Pricing model', desc:'Simple and performance‑based. No lock‑in. We like to begin with a test month.',
+          p1:{pill:'Start', title:'Growth Sprint (2 weeks)', amount:'9 000 SEK', text:'1 sprint with hypothesis → creative production → test → report. Perfect to get started quickly.', list:['3–5 creative variants','1 landing block / CRO test','Setup & tracking']},
+          p2:{pill:'Scale', title:'Retention + Rev‑Share', amount:'4 500 SEK/mo + 10%', text:'Ongoing iteration and scaling. Low fixed fee + percentage of measured uplift.', list:['Weekly tests & report','Continuous CRO','Scaling strategy']},
+          band:{text:'<b>Not sure where to start?</b> We do a free 20‑min review of accounts and landing pages.', btn:'Book a review'}
+        },
+        faq:{title:'FAQ', desc:'Short answers to what we’re asked most.',
+          q1:{q:'How fast do we see results?', a:'First clear signals within 2–4 weeks. Full effect usually after 6–10 weeks.'},
+          q2:{q:'Which platforms do you run?', a:'Meta, TikTok, Google (PMAX/Shopping/Brand). We adapt to goals and product.'},
+          q3:{q:'How do you measure?', a:'Server‑side or CAPI where needed, clear events and a simple dashboard per goal.'}
+        },
+        contact:{title:'Book an intro', desc:'Write a few lines and we’ll get back within 24h. Minimal form, maximum clarity.',
+          labels:{name:'Name', email:'Email', company:'Company (optional)', message:'Short description'},
+          placeholders:{name:'Your name', email:'name@company.com', company:'Company name', message:'What do you want to achieve?'},
+          submit:'Send', note:'We’ll get back within 24h. No spam.',
+          next:{title:'What happens next?', text:'We book 20 minutes, review accounts/landing pages and suggest a simple plan for the first sprint.', list:['0 SEK, no lock‑in','Concrete suggestions','Clear KPIs']},
+          cardTitle:'Contact', cardText:'kontakt@scalelab.se<br>+46 70 000 00 00<br>Varberg, Sweden'
+        },
+        footer:{top:'Back to top', pricing:'Pricing', contact:'Contact', rights:'All rights reserved.'}
+      }
+    };
+
+    let currentLang = (localStorage.getItem('lang') || (navigator.language||'sv').startsWith('sv') ? 'sv' : 'en');
+
+    function applyLang(lang){
+      currentLang = lang;
+      localStorage.setItem('lang', lang);
+      const t = i18n[lang];
+      document.documentElement.lang = t.htmlLang;
+      document.title = t.title;
+      const metaDesc = document.querySelector('meta[name="description"]');
+      if(metaDesc) metaDesc.setAttribute('content', t.desc);
+
+      // Nav
+      document.getElementById('nav-cases').textContent = t.nav.cases;
+      document.getElementById('nav-services').textContent = t.nav.services;
+      document.getElementById('nav-process').textContent = t.nav.process;
+      document.getElementById('nav-pricing').textContent = t.nav.pricing;
+      document.getElementById('nav-cta').textContent = t.nav.cta;
+
+      // Hero
+      document.getElementById('hero-kicker').textContent = t.hero.kicker;
+      document.getElementById('hero-title').textContent = t.hero.title;
+      document.getElementById('hero-lead').textContent = t.hero.lead;
+      document.getElementById('tag-ads').textContent = t.hero.tags.ads;
+      document.getElementById('tag-ugc').textContent = t.hero.tags.ugc;
+      document.getElementById('tag-cro').textContent = t.hero.tags.cro;
+      document.getElementById('tag-niches').textContent = t.hero.tags.niches;
+      document.getElementById('btn-start').textContent = t.hero.btnStart;
+      document.getElementById('btn-cases').textContent = t.hero.btnCases;
+      document.getElementById('stat-1').textContent = t.hero.stats[0];
+      document.getElementById('stat-2').textContent = t.hero.stats[1];
+      document.getElementById('stat-3').textContent = t.hero.stats[2];
+      document.getElementById('pill-1').textContent = t.hero.pills[0];
+      document.getElementById('pill-2').textContent = t.hero.pills[1];
+      document.getElementById('pill-3').textContent = t.hero.pills[2];
+      document.getElementById('marquee-label').setAttribute('aria-label', t.marquee);
+
+      // Cases
+      document.getElementById('cases-title').textContent = t.cases.title;
+      document.getElementById('cases-desc').textContent = t.cases.desc;
+      document.getElementById('case1-title').textContent = t.cases.c1.title;
+      document.getElementById('case1-text').innerHTML = t.cases.c1.text;
+      document.getElementById('case2-title').textContent = t.cases.c2.title;
+      document.getElementById('case2-text').innerHTML = t.cases.c2.text;
+      document.getElementById('case3-title').textContent = t.cases.c3.title;
+      document.getElementById('case3-text').innerHTML = t.cases.c3.text;
+
+      // Services
+      document.getElementById('services-title').textContent = t.services.title;
+      document.getElementById('services-desc').textContent = t.services.desc;
+      document.getElementById('svc1-title').textContent = t.services.s1.title;
+      document.getElementById('svc1-text').textContent = t.services.s1.text;
+      document.getElementById('svc2-title').textContent = t.services.s2.title;
+      document.getElementById('svc2-text').textContent = t.services.s2.text;
+      document.getElementById('svc3-title').textContent = t.services.s3.title;
+      document.getElementById('svc3-text').textContent = t.services.s3.text;
+
+      // Process
+      document.getElementById('process-title').textContent = t.process.title;
+      document.getElementById('process-desc').textContent = t.process.desc;
+      document.getElementById('p1').textContent = t.process.p1.t;
+      document.getElementById('p1t').textContent = t.process.p1.d;
+      document.getElementById('p2').textContent = t.process.p2.t;
+      document.getElementById('p2t').textContent = t.process.p2.d;
+      document.getElementById('p3').textContent = t.process.p3.t;
+      document.getElementById('p3t').textContent = t.process.p3.d;
+      document.getElementById('p4').textContent = t.process.p4.t;
+      document.getElementById('p4t').textContent = t.process.p4.d;
+
+      // Metrics
+      document.getElementById('metrics-title').textContent = t.metrics.title;
+      document.getElementById('metrics-desc').textContent = t.metrics.desc;
+      document.getElementById('m1t').textContent = t.metrics.m1;
+      document.getElementById('m2t').textContent = t.metrics.m2;
+      document.getElementById('m3t').textContent = t.metrics.m3;
+      document.getElementById('m4t').textContent = t.metrics.m4;
+
+      // Pricing
+      document.getElementById('pricing-title').textContent = t.pricing.title;
+      document.getElementById('pricing-desc').textContent = t.pricing.desc;
+      document.getElementById('price1-pill').textContent = t.pricing.p1.pill;
+      document.getElementById('price1-title').textContent = t.pricing.p1.title;
+      document.getElementById('price1-amount').textContent = t.pricing.p1.amount;
+      document.getElementById('price1-text').textContent = t.pricing.p1.text;
+      document.getElementById('price1-list').innerHTML = t.pricing.p1.list.map(li=>`<li>${li}</li>`).join('');
+      document.getElementById('price2-pill').textContent = t.pricing.p2.pill;
+      document.getElementById('price2-title').textContent = t.pricing.p2.title;
+      document.getElementById('price2-amount').textContent = t.pricing.p2.amount;
+      document.getElementById('price2-text').textContent = t.pricing.p2.text;
+      document.getElementById('price2-list').innerHTML = t.pricing.p2.list.map(li=>`<li>${li}</li>`).join('');
+      document.getElementById('band-text').innerHTML = t.pricing.band.text;
+      document.getElementById('band-btn').textContent = t.pricing.band.btn;
+
+      // FAQ
+      document.getElementById('faq-title').textContent = t.faq.title;
+      document.getElementById('faq-desc').textContent = t.faq.desc;
+      document.getElementById('faq1-q').textContent = t.faq.q1.q;
+      document.getElementById('faq1-a').textContent = t.faq.q1.a;
+      document.getElementById('faq2-q').textContent = t.faq.q2.q;
+      document.getElementById('faq2-a').textContent = t.faq.q2.a;
+      document.getElementById('faq3-q').textContent = t.faq.q3.q;
+      document.getElementById('faq3-a').textContent = t.faq.q3.a;
+
+      // Contact
+      document.getElementById('contact-title').textContent = t.contact.title;
+      document.getElementById('contact-desc').textContent = t.contact.desc;
+      document.getElementById('label-name').textContent = t.contact.labels.name;
+      document.getElementById('label-email').textContent = t.contact.labels.email;
+      document.getElementById('label-company').textContent = t.contact.labels.company;
+      document.getElementById('label-message').textContent = t.contact.labels.message;
+      document.getElementById('name').placeholder = t.contact.placeholders.name;
+      document.getElementById('email').placeholder = t.contact.placeholders.email;
+      document.getElementById('company').placeholder = t.contact.placeholders.company;
+      document.getElementById('message').placeholder = t.contact.placeholders.message;
+      document.getElementById('btn-submit').textContent = t.contact.submit;
+      document.getElementById('formNote').textContent = t.contact.note;
+      document.getElementById('next-title').textContent = t.contact.next.title;
+      document.getElementById('next-text').textContent = t.contact.next.text;
+      document.getElementById('next-list').innerHTML = t.contact.next.list.map(li=>`<li>${li}</li>`).join('');
+      document.getElementById('contact-card-title').textContent = t.contact.cardTitle;
+      document.getElementById('contact-card-text').innerHTML = t.contact.cardText;
+
+      // Footer
+      document.getElementById('footer-top').textContent = t.footer.top;
+      document.getElementById('footer-pricing').textContent = t.footer.pricing;
+      document.getElementById('footer-contact').textContent = t.footer.contact;
+      document.getElementById('footer-rights').textContent = t.footer.rights;
+
+      // Toggle buttons aria state
+      document.getElementById('lang-sv').setAttribute('aria-pressed', lang==='sv');
+      document.getElementById('lang-en').setAttribute('aria-pressed', lang==='en');
+    }
+
+    // init
+    applyLang(currentLang);
+    document.getElementById('lang-sv').addEventListener('click', ()=> applyLang('sv'));
+    document.getElementById('lang-en').addEventListener('click', ()=> applyLang('en'));
+
+  
+  // === Hamburger logic ===
+  const body = document.body;
+  const menuBtn = document.getElementById('menuBtn');
+  const drawer = document.getElementById('drawer');
+  const scrim = document.getElementById('scrim');
+  const closeDrawer = document.getElementById('closeDrawer');
+
+  function openMenu(){
+    body.classList.add('menu-open');
+    menuBtn.setAttribute('aria-expanded','true');
+    drawer.setAttribute('aria-hidden','false');
+    scrim.hidden = false;
+  }
+  function closeMenu(){
+    body.classList.remove('menu-open');
+    menuBtn.setAttribute('aria-expanded','false');
+    drawer.setAttribute('aria-hidden','true');
+    // liten delay innan scrim göms helt för bättre fade
+    setTimeout(()=>{ if(!body.classList.contains('menu-open')) scrim.hidden = true; }, 200);
+  }
+
+  menuBtn.addEventListener('click', ()=> body.classList.contains('menu-open') ? closeMenu() : openMenu());
+  closeDrawer.addEventListener('click', closeMenu);
+  scrim.addEventListener('click', closeMenu);
+  drawer.addEventListener('click', (e)=>{ if(e.target.tagName === 'A') closeMenu(); });
+  document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeMenu(); });
+
+  // === Koppla mobilens språkknappar till samma i18n ===
+  const mSv = document.getElementById('m-lang-sv');
+  const mEn = document.getElementById('m-lang-en');
+  mSv.addEventListener('click', ()=>{ applyLang('sv'); mSv.setAttribute('aria-pressed','true'); mEn.setAttribute('aria-pressed','false'); });
+  mEn.addEventListener('click', ()=>{ applyLang('en'); mSv.setAttribute('aria-pressed','false'); mEn.setAttribute('aria-pressed','true'); });
+
+  // === Uppdatera mobilmenytexter vid språkbyte ===
+  const _applyLangOld = applyLang;
+  applyLang = function(lang){
+    _applyLangOld(lang);
+    const t = i18n[lang];
+    // nav labels i mobil
+    document.getElementById('m-cases').textContent   = t.nav.cases;
+    document.getElementById('m-services').textContent= t.nav.services;
+    document.getElementById('m-process').textContent = t.nav.process;
+    document.getElementById('m-pricing').textContent = t.nav.pricing;
+    document.getElementById('m-cta').textContent     = t.nav.cta;
+    // språkknapparnas aria-pressed i mobil
+    document.getElementById('m-lang-sv').setAttribute('aria-pressed', lang==='sv');
+    document.getElementById('m-lang-en').setAttribute('aria-pressed', lang==='en');
+  };
+
+  // Kör en gång för att fylla mobilmenyn korrekt
+  applyLang(currentLang);
+
+  // --- Brands marquee: sömlös loop + auto-duration ---
+(function(){
+  const marquee = document.querySelector('.marquee');
+  const track   = marquee?.querySelector('.track');
+  if(!marquee || !track) return;
+
+  const originals = [...track.children];
+  let total = track.scrollWidth;
+  const target = marquee.clientWidth * 2; // minst 2x för sömlös loop
+
+  while(total < target){
+    originals.forEach(n => track.appendChild(n.cloneNode(true)));
+    total = track.scrollWidth;
+  }
+
+  // hastighet: px/sek
+  const pxPerSec = 60; // ändra till 40 om du vill långsammare
+  const duration = total / pxPerSec;
+  track.style.setProperty('--duration', duration + 's');
+  track.style.setProperty('--shift', `-${(total/2)}px`);
+})();
+
+
+  </script>
+</body>
+</html>
